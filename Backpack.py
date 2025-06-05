@@ -1,43 +1,37 @@
-import itertools  # Mengimpor modul itertools untuk menghasilkan kombinasi
+import itertools
 
-# Kelas untuk merepresentasikan sebuah item
 class Item:
     def __init__(self, name, weight, value):
-        self.name = name      # Menyimpan nama item
-        self.weight = weight  # Menyimpan berat item
-        self.value = value    # Menyimpan nilai item
+        self.name = name
+        self.weight = weight
+        self.value = value
     
     def __repr__(self):
-        # Menentukan cara menampilkan objek item saat diprint
         return f"{self.name} (Weight: {self.weight}, Value: {self.value})"
 
-# Kelas utama untuk optimasi knapsack
 class KnapsackOptimizer:
     def __init__(self):
-        self.items = []           # Menyimpan daftar item
-        self.capacity = 0         # Menyimpan kapasitas ransel
+        self.items = []
+        self.capacity = 0
     
     def add_item(self, name, weight, value):
-        # Menambahkan item baru ke daftar
         self.items.append(Item(name, weight, value))
     
     def set_capacity(self, capacity):
-        # Mengatur kapasitas ransel
         self.capacity = capacity
     
     def exhaustive_search(self):
-        """Mencoba semua kombinasi item yang mungkin"""
-        best_value = 0            # Menyimpan nilai terbaik
-        best_combination = []     # Menyimpan kombinasi terbaik
+        """Try all possible combinations of items."""
+        best_value = 0
+        best_combination = []
         
-        # Menghasilkan semua kombinasi yang mungkin
+        # Generate all possible combinations of items
         for i in range(len(self.items) + 1):
             for combination in itertools.combinations(self.items, i):
-                # Menghitung total berat dan nilai untuk setiap kombinasi
                 total_weight = sum(item.weight for item in combination)
                 total_value = sum(item.value for item in combination)
                 
-                # Memeriksa apakah kombinasi ini valid dan lebih baik
+                # Check if this combination is valid and better than current best
                 if total_weight <= self.capacity and total_value > best_value:
                     best_value = total_value
                     best_combination = combination
@@ -45,15 +39,14 @@ class KnapsackOptimizer:
         return best_combination, sum(item.weight for item in best_combination), best_value
     
     def heuristic_search(self):
-        """Pendekatan greedy berdasarkan rasio nilai/berat"""
-        # Mengurutkan item berdasarkan rasio nilai/berat secara menurun
+        """Greedy approach based on value/weight ratio."""
+        # Sort items by value/weight ratio in descending order
         sorted_items = sorted(self.items, key=lambda item: item.value / item.weight, reverse=True)
         
-        selected_items = []    # Menyimpan item yang dipilih
-        total_weight = 0      # Menyimpan total berat
-        total_value = 0       # Menyimpan total nilai
+        selected_items = []
+        total_weight = 0
+        total_value = 0
         
-        # Memilih item berdasarkan rasio terbaik
         for item in sorted_items:
             if total_weight + item.weight <= self.capacity:
                 selected_items.append(item)
@@ -63,43 +56,44 @@ class KnapsackOptimizer:
         return selected_items, total_weight, total_value
 
 def main():
-    optimizer = KnapsackOptimizer()    # Membuat objek optimizer
+    optimizer = KnapsackOptimizer()
     
-    print("===== KNAPSACK OPTIMIZER =====")
+    print("===== Backpack Optimizer =====")
     
-    # Mendapatkan kapasitas ransel dari pengguna
-    capacity = int(input("Enter backpack capacity: "))
+    # Get backpack capacity
+    capacity = int(input("Enter Backpack capacity: "))
     optimizer.set_capacity(capacity)
     
-    # Mendapatkan jumlah dan detail item dari pengguna
-    num_items = int(input("Enter number of items: "))
+    # Get items
+    num_items = int(input("Masukan Berapa Item yang dibawa: "))
     
     for i in range(num_items):
         print(f"\nItem {i+1}:")
-        name = input("  Name: ")
-        weight = int(input("  Weight: "))
-        value = int(input("  Value: "))
+        name = input("  Nama Barang: ")
+        weight = int(input("  Weight (KG): "))
+        value = int(input("  Value (1-10): "))
+        
         optimizer.add_item(name, weight, value)
     
-    # Menampilkan hasil pencarian exhaustive
     print("\n===== RESULTS =====")
+    
+    # Exhaustive search
     print("\nEXHAUSTIVE SEARCH (tries all combinations):")
     items, weight, value = optimizer.exhaustive_search()
     print("Selected items:")
     for item in items:
         print(f"  - {item}")
-    print(f"Total weight: {weight}")
-    print(f"Total value: {value}")
+    print(f"Total weight (KG): {weight}")
+    print(f"Total value (1-10): {value}")
     
-    # Menampilkan hasil pencarian heuristik
+    # Heuristic search
     print("\nHEURISTIC SEARCH (based on value/weight ratio):")
     items, weight, value = optimizer.heuristic_search()
     print("Selected items:")
     for item in items:
         print(f"  - {item}")
-    print(f"Total weight: {weight}")
-    print(f"Total value: {value}")
+    print(f"Total weight (KG): {weight}")
+    print(f"Total value (1-10): {value}")
 
-# Menjalankan program jika file dieksekusi langsung
 if __name__ == "__main__":
     main()
